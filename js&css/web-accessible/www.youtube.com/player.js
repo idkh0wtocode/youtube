@@ -1,3 +1,97 @@
+/*--------------------------------------------------------------
+# christian Cardenas Home button while in fullscreen
+--------------------------------------------------------------*/
+ImprovedTube.fullscreenHomeButton = function () {
+    console.log('ImprovedTube: fullscreenHomeButton function called.');
+
+    // Early exit if feature is disabled
+    if (!this.storage.fullscreen_home_button) {
+        console.log('ImprovedTube: Custom home button is DISABLED in settings.');
+        const existingButton = document.getElementById('fullscreen-home-button');
+        if (existingButton) {
+            existingButton.remove();
+            console.log('ImprovedTube: Removed #fullscreen-home-button because feature is disabled.');
+        }
+        return;
+    }
+	// Feature is enabled
+    console.log('ImprovedTube: Custom home button is ENABLED in settings.');
+
+    // Remove existing button if it exists
+    const existingButton = document.getElementById('fullscreen-home-button');
+    if (existingButton) {
+        existingButton.remove();
+        console.log('ImprovedTube: Removed existing #fullscreen-home-button.');
+    }
+
+	// Create the home button
+    const homeButton = document.createElement('button');
+    homeButton.id = 'fullscreen-home-button';
+    homeButton.title = 'Return to YouTube';
+    homeButton.setAttribute('aria-label', 'Return to YouTube Home or Subscriptions');
+    console.log('ImprovedTube: Created homeButton element with ID:', homeButton.id);
+
+
+	// Create the text label based on user setting
+    const destination = ImprovedTube.storage.home_button_destination;
+    const buttonText = document.createElement('span');
+    buttonText.textContent = destination === 'subscriptions' ? 'Subscriptions' : 'Home';
+    homeButton.appendChild(buttonText);
+    console.log('ImprovedTube: Added text to homeButton:', buttonText.textContent);
+
+	// Add click handler to navigate based on user setting
+    homeButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('ImprovedTube: Custom home button clicked. Destination:', ImprovedTube.storage.home_button_destination);
+        if (ImprovedTube.storage.home_button_destination === 'subscriptions') {
+            window.location.href = '/feed/subscriptions';
+        } else {
+            window.location.href = '/';
+        }
+    });
+
+	// Helper function to insert the button into the player controls
+	const insertButton = () => {
+		const player = document.querySelector('.html5-video-player');
+		const titleContainer = document.querySelector('.ytp-chrome-bottom'); // ytp-title-text,ytp-chrome-bottom, ytp-chrome-top
+		if (player && titleContainer && player.classList.contains('ytp-fullscreen')) {
+			// Position button in top-left corner of fullscreen player
+			titleContainer.parentNode.insertBefore(homeButton, titleContainer);
+		}
+	};
+
+	// Observe fullscreen changes to insert/remove button
+    const videoPlayer = document.querySelector('.html5-video-player');
+    if (videoPlayer) {
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    if (mutation.target.classList.contains('ytp-fullscreen')) {
+                        setTimeout(insertButton, 100);
+                        console.log('ImprovedTube: Detected fullscreen entry. Scheduling button insertion.');
+                    } else {
+                        const currentButton = document.getElementById('fullscreen-home-button');
+                        if (currentButton) {
+                            currentButton.remove();
+                            console.log('ImprovedTube: Detected fullscreen exit. Removed button.');
+                        }
+                    }
+                }
+            });
+        });
+        observer.observe(videoPlayer, { attributes: true, attributeFilter: ['class'] });
+        console.log('ImprovedTube: Started observing video player for fullscreen changes.');
+
+        if (videoPlayer.classList.contains('ytp-fullscreen')) {
+            insertButton();
+            console.log('ImprovedTube: Player already in fullscreen on load. Inserting button immediately.');
+        }
+    } else {
+        console.warn('ImprovedTube: YouTube video player element not found.');
+    }
+};
+
 /*------------------------------------------------------------------------------
 AUTOPLAY DISABLE
 ------------------------------------------------------------------------------*/

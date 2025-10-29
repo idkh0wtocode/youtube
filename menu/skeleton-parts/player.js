@@ -61,6 +61,28 @@ extension.skeleton.main.layers.section.player.on.click = {
 				}
 			}
 		},
+		// christian cardenas - code for home/sub button
+        fullscreenHomeButton: {
+            component: 'switch',
+            text: 'fullscreenHomeButton',
+            storage: 'fullscreen_home_button',
+        },
+
+        homeButtonDestination: {
+            component: 'select',
+            text: 'homeButtonDestination',
+            storage: 'home_button_destination',
+            options: [{
+                text: 'homepage',
+                value: 'homepage'
+            }, {
+                text: 'subscriptions',
+                value: 'subscriptions'
+            }],
+            value: 'homepage'
+        },
+
+		// --- end code for home/sub button
 		only_one_player_instance_playing: {
 			component: 'switch',
 			text: 'onlyOnePlayerInstancePlaying',

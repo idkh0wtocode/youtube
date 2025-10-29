@@ -342,6 +342,7 @@ ImprovedTube.videoPageUpdate = function () {
 		ImprovedTube.playerCinemaModeButton();
 		ImprovedTube.playerHamburgerButton();
 		ImprovedTube.playerControls();
+		ImprovedTube.fullscreenHomeButton(); // my button
 	}
 };
 
